@@ -1,54 +1,48 @@
 import sys
 import time
-sys.path.insert(0, r'C:\Users\user\PyApps\SecurityPython\Modules') # Import the files where the modules are located
+sys.path.insert(0, r'..\Modules') # Import the files where the modules are located
 
 from Modules.Node import MyNode
 
-node_1 = MyNode("127.0.0.1", 8001, 1)
-node_2 = MyNode("127.0.0.1", 8002, 2)
-node_3 = MyNode("127.0.0.1", 8003, 3)
+# The port to listen for incoming node connections
+port = 9876 # default
 
-time.sleep(1)
+# Syntax file_sharing_node.py port
+if len(sys.argv) > 1:
+    port = int(sys.argv[1])
 
-node_1.start()
-node_2.start()
-node_3.start()
+# Instantiate the node MyNode, it creates a thread to handle all functionality
+node = MyNode("127.0.0.1", port)
 
-time.sleep(1)
+# Start the node, if not started it shall not handle any requests!
+node.start()
 
-debug = False
-node_1.debug = debug
-node_2.debug = debug
-node_3.debug = debug
+# The method prints the help commands text to the console
+def print_help():
+    print("stop - Stops the application.")
+    print("help - Prints this help text.")
 
+def node_connect(node:MyNode):
+    ipIn = input("> IP Address:")
+    portIn = input("> Port:")
+    node.connect_with_node(ipIn, portIn)
 
-node_1.connect_with_node('127.0.0.1', 8002)
-node_2.connect_with_node('127.0.0.1', 8003)
-node_3.connect_with_node('127.0.0.1', 8001)
+# Implement a console application
+connected = 0
+command = input("? ")
+while ( command != "stop" ):
+    if ( command == "help" ):
+        print_help()
+    if ( command == "connect" ):
+        node_connect()
+        connected+=1
+    else:
+        print( command + " is not a command.")
+    command = input("? ")
 
-time.sleep(2)
+node.stop()
 
-node_1.send_to_nodes("message: Hi there!")
-
-time.sleep(2)
-
-print("node 1 is stopping..")
-node_1.stop()
-
-time.sleep(20)
-
-node_2.send_to_nodes("message: Hi there node 2!")
-node_2.send_to_nodes("message: Hi there node 2!")
-node_2.send_to_nodes("message: Hi there node 2!")
-node_3.send_to_nodes("message: Hi there node 2!")
-node_3.send_to_nodes("message: Hi there node 2!")
-node_3.send_to_nodes("message: Hi there node 2!")
-
-time.sleep(10)
-
-time.sleep(5)
-
-node_1.stop()
-node_2.stop()
-node_3.stop()
-print('end test')
+#node.connect_with_node('127.0.0.1', port)
+#node.send_to_nodes("message")
+#node.start()
+#node.stop()

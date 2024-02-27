@@ -12,7 +12,7 @@ if len(sys.argv) > 1:
     port = int(sys.argv[1])
 
 # Instantiate the node MyNode, it creates a thread to handle all functionality
-node = MyNode("127.0.0.1", port)
+node = MyNode("127.0.0.1", port,None,None,1)
 
 # Start the node, if not started it shall not handle any requests!
 node.start()
@@ -24,8 +24,15 @@ def print_help():
 
 def node_connect(node:MyNode):
     ipIn = input("> IP Address:")
-    portIn = input("> Port:")
+    portIn = int(input("> Port:"))
     node.connect_with_node(ipIn, portIn)
+
+def write_to(node:MyNode):
+    inText = ""
+    while (inText != "$exit"):
+        print("Messaging open. Type \"$exit\" to return to the menu")
+        inText = input(">")
+        node.send_to_nodes(inText)
 
 # Implement a console application
 connected = 0
@@ -34,8 +41,8 @@ while ( command != "stop" ):
     if ( command == "help" ):
         print_help()
     if ( command == "connect" ):
-        node_connect()
-        connected+=1
+        node_connect(node)
+        write_to(node)
     else:
         print( command + " is not a command.")
     command = input("? ")

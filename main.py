@@ -21,6 +21,7 @@ node.start()
 def print_help():
     print("stop - Stops the application.")
     print("help - Prints this help text.")
+    print("connect - Connect to  a remote node. Args are IP address and Port.")
 
 def node_connect(node:MyNode):
     ipIn = input("> IP Address:")
@@ -40,7 +41,7 @@ command = input("? ")
 while ( command != "stop" ):
     if ( command == "help" ):
         print_help()
-    if ( command == "connect" ):
+    elif ( command == "connect" ):
         node_connect(node)
         write_to(node)
     else:

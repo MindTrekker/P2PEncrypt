@@ -3,6 +3,7 @@ import time
 sys.path.insert(0, r'..\Modules') # Import the files where the modules are located
 
 from Modules.Node import MyNode
+from Modules.NodeConnection import MyNodeConnection
 
 # The port to listen for incoming node connections
 port = 9876 # default
@@ -28,25 +29,46 @@ def node_connect(node:MyNode):
     portIn = int(input("> Port:"))
     node.connect_with_node(ipIn, portIn)
 
+'''
 def write_to(node:MyNode):
     inText = ""
+    print("Messaging open. Type \"$exit\" to return to the menu")
     while (inText != "$exit"):
-        print("Messaging open. Type \"$exit\" to return to the menu")
         inText = input(">")
         node.send_to_nodes(inText)
-
+'''
 # Implement a console application
-connected = 0
-command = input("? ")
+connected = False
+prompt = "? "
+command = input(prompt)
 while ( command != "stop" ):
     if ( command == "help" ):
         print_help()
+
     elif ( command == "connect" ):
         node_connect(node)
-        write_to(node)
+    
+    elif (command == "cinfo"):
+        node.print_connections()
+
+    elif ( command == "write" ):
+        if connected:
+            inText = input("> ")
+            node.send_to_nodes(inText)
+        else:
+            print("No nodes Connected.")
+
     else:
         print( command + " is not a command.")
-    command = input("? ")
+
+    if len(node.all_nodes) >= 1:
+        connected = True
+
+    if connected:
+        prompt = "! "
+    else:
+        prompt = "? "
+    command = input(prompt)
 
 node.stop()
 

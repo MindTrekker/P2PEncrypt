@@ -14,31 +14,31 @@ class MyNode (Node):
         if (self.debug):
             print("outbound_node_connected (" + self.id + "): " + node.id)
         else:
-            print("\nConnection Sucessfull:\n! ")
+            print("\nConnection Sucessfull...")
             
     def inbound_node_connected(self, node):
         if (self.debug):
             print("inbound_node_connected: (" + self.id + "): " + node.id)
         else:
-            print("\nRemote Node Connected:\n! ")
+            print("\nRemote Node Connected...")
 
     def inbound_node_disconnected(self, node):
         if (self.debug):
             print("inbound_node_disconnected: (" + self.id + "): " + node.id)
         else:
-            print("\nRemote Node Disconnected:\n? ")
+            print("\nRemote Node Disconnected...")
 
     def outbound_node_disconnected(self, node):
         if (self.debug):
             print("outbound_node_disconnected: (" + self.id + "): " + node.id)
         else:
-            print("\nSucessfully Disconnected:\n? ")
+            print("\nConnection Terminated...")
 
     def node_message(self, node, data):
         if (self.debug):
             print("node_message (" + self.id + ") from " + node.id + ": " + str(data))
         else:
-            print("Message: " + str(data))
+            print("->" + str(data))
         
     def node_disconnect_with_outbound_node(self, node):
         if (self.debug):

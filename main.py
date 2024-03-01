@@ -1,5 +1,7 @@
 import sys
-import time
+from prompt_toolkit import PromptSession
+from prompt_toolkit.patch_stdout import patch_stdout
+import asyncio
 sys.path.insert(0, r'..\Modules') # Import the files where the modules are located
 
 from Modules.Node import MyNode
@@ -20,9 +22,11 @@ node.start()
 
 # The method prints the help commands text to the console
 def print_help():
-    print("stop - Stops the application.")
-    print("help - Prints this help text.")
-    print("connect - Connect to  a remote node. Args are IP address and Port.")
+    print("?stop - Stops the application.")
+    print("?help - Prints this help text.")
+    print("?connect - Connect to  a remote node. Args are IP address and Port.")
+    print("?disconnect - Disonnect from the current node.")
+    print("?cinfo - Get connection info.")
 
 def node_connect(node:MyNode):
     ipIn = input("> IP Address:")
@@ -38,38 +42,41 @@ def write_to(node:MyNode):
         node.send_to_nodes(inText)
 '''
 # Implement a console application
-connected = False
-prompt = "? "
-command = input(prompt)
-while ( command != "stop" ):
-    if ( command == "help" ):
-        print_help()
-
-    elif ( command == "connect" ):
-        node_connect(node)
+def Inputs():
     
-    elif (command == "cinfo"):
-        node.print_connections()
+    print("Connect to a remote node to get started: type?help for a list of commands")
+    connected = False
+    command = input()
+    while ( command != "?stop" ):
+            
+            if len(node.all_nodes) >= 1:
+                connected = True
+            else:
+                connected = False
 
-    elif ( command == "write" ):
-        if connected:
-            inText = input("> ")
-            node.send_to_nodes(inText)
-        else:
-            print("No nodes Connected.")
+            if ( command == "?help" ):
+                print_help()
 
-    else:
-        print( command + " is not a command.")
+            elif ( command == "?connect" ):
+                node_connect(node)
+    
+            elif (command == "?cinfo"):
+                node.print_connections()
 
-    if len(node.all_nodes) >= 1:
-        connected = True
+            elif ( command == "?disconnect" ):
+                if (len(node.nodes_outbound) > 0):
+                    node.disconnect_with_node(node.nodes_outbound[0])
+                if (len(node.nodes_inbound) > 0):    
+                    node.disconnect_with_node(node.nodes_inbound[0])
+            else:
+                if connected:
+                    node.send_to_nodes(command)
+                else:
+                    print("No nodes Connected.")
 
-    if connected:
-        prompt = "! "
-    else:
-        prompt = "? "
-    command = input(prompt)
+            command = input()
 
+Inputs()
 node.stop()
 
 #node.connect_with_node('127.0.0.1', port)

@@ -1,21 +1,37 @@
 import sys
-from prompt_toolkit import PromptSession
-from prompt_toolkit.patch_stdout import patch_stdout
-import asyncio
+import os.path
 sys.path.insert(0, r'..\Modules') # Import the files where the modules are located
 
 from Modules.Node import MyNode
 from Modules.NodeConnection import MyNodeConnection
 
 # The port to listen for incoming node connections
+publicDefaultKey = 1234567890
+testIP = "127.0.0.1"
 port = 9876 # default
 
 # Syntax file_sharing_node.py port
 if len(sys.argv) > 1:
     port = int(sys.argv[1])
 
+#create default file
+if not os.path.exists("default.txt"):
+    f = open("default.txt",'w')
+    f.write("default," + testIP + "," + str(port) + "," + str(publicDefaultKey))
+    f.close()
+
+curUser = input("> Local User Name:")
+conInfo = ""
+while conInfo == "":
+    if os.path.exists(curUser.lower() + ".txt"):
+        fi = open(curUser.lower() + ".txt", 'r')
+        conInfo = fi.readline()
+        fi.close()
+    else:
+        print("user file does not exist")
+        
 # Instantiate the node MyNode, it creates a thread to handle all functionality
-node = MyNode("127.0.0.1", port,None,None,1)
+node = MyNode(testIP, port,None,None,1)
 
 # Start the node, if not started it shall not handle any requests!
 node.start()
@@ -24,23 +40,29 @@ node.start()
 def print_help():
     print("?stop - Stops the application.")
     print("?help - Prints this help text.")
-    print("?connect - Connect to  a remote node. Args are IP address and Port.")
+    print("?connect - Connect to  a remote node. Args are Host and Port.")
     print("?disconnect - Disonnect from the current node.")
     print("?cinfo - Get connection info.")
 
 def node_connect(node:MyNode):
-    ipIn = input("> IP Address:")
-    portIn = int(input("> Port:"))
-    node.connect_with_node(ipIn, portIn)
+    
+    ipIn = input("> Remote Host:")
+    if (ipIn[0].isalpha()):
+        #name stuff
+        if os.path.exists(ipIn.lower() + ".txt"):
+            fo = open(ipIn.lower() + ".txt",'r')
+            info = fo.readline()
+            fo.close()
+            splitInfo = info.split(",")
+            foIP = splitInfo[1]
+            foPort = int(splitInfo[2])
+            node.connect_with_node(foIP, foPort)
+    else:
+        portIn = int(input("> Remote Port:"))
+        node.connect_with_node(ipIn, portIn)
+    
+    node.send_to_nodes("¶" + conInfo)
 
-'''
-def write_to(node:MyNode):
-    inText = ""
-    print("Messaging open. Type \"$exit\" to return to the menu")
-    while (inText != "$exit"):
-        inText = input(">")
-        node.send_to_nodes(inText)
-'''
 # Implement a console application
 def Inputs():
     

@@ -1,3 +1,4 @@
+import os.path
 from p2pnetwork.node import Node
 class MyNode (Node):
     
@@ -38,7 +39,15 @@ class MyNode (Node):
         if (self.debug):
             print("node_message (" + self.id + ") from " + node.id + ": " + str(data))
         else:
-            print("->" + str(data))
+            newdata = str(data).removeprefix("¶")
+            if (str(data) != newdata):
+                splitData = newdata.lower().split(",")
+                if not os.path.exists(splitData[0] + ".txt"):
+                    f = open(splitData[0] + ".txt", 'w')
+                    f.write(newdata)
+                    f.close
+            else:
+                print("->" + str(data))
         
     def node_disconnect_with_outbound_node(self, node):
         if (self.debug):

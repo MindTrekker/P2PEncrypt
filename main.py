@@ -47,6 +47,7 @@ def print_help():
     print("?connect - Connect to  a remote node. Args are Host and Port.")
     print("?disconnect - Disonnect from the current node.")
     print("?cinfo - Get connection info.")
+    print("?adduser - creates a new user file.")
 
 def node_connect(node:MyNode):
     

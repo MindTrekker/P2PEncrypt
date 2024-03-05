@@ -20,15 +20,19 @@ if not os.path.exists("default.txt"):
     f.write("default," + testIP + "," + str(port) + "," + str(publicDefaultKey))
     f.close()
 
-curUser = input("> Local User Name:")
+
 conInfo = ""
 while conInfo == "":
+    curUser = input("> Local User Name:")
     if os.path.exists(curUser.lower() + ".txt"):
         fi = open(curUser.lower() + ".txt", 'r')
         conInfo = fi.readline()
+        splitinfo = conInfo.split(",")
+        testIP = splitinfo[1]
+        port = int(splitinfo[2])
         fi.close()
     else:
-        print("user file does not exist")
+        print("User file does not exist...")
         
 # Instantiate the node MyNode, it creates a thread to handle all functionality
 node = MyNode(testIP, port,None,None,1)
@@ -49,19 +53,37 @@ def node_connect(node:MyNode):
     ipIn = input("> Remote Host:")
     if (ipIn[0].isalpha()):
         #name stuff
-        if os.path.exists(ipIn.lower() + ".txt"):
-            fo = open(ipIn.lower() + ".txt",'r')
+        if os.path.exists("contact" + ipIn.lower() + ".txt"):
+            fo = open("contact" + ipIn.lower() + ".txt",'r')
             info = fo.readline()
             fo.close()
             splitInfo = info.split(",")
             foIP = splitInfo[1]
             foPort = int(splitInfo[2])
             node.connect_with_node(foIP, foPort)
+        else:
+            print("Contact not found...")
     else:
         portIn = int(input("> Remote Port:"))
         node.connect_with_node(ipIn, portIn)
     
     node.send_to_nodes("¶" + conInfo)
+
+def create_user(name:str,host:str = testIP, uport:str = str(port)):
+    #random key generator code here
+    publicplaceholderkey = 123456789
+    privateplaceholderkey = 987654321
+    if not os.path.exists(name.lower() + ".txt"):
+            naf = open(name.lower() + ".txt",'w')
+            naf.write(name + "," + host + "," + str(uport) + "," + str(publicplaceholderkey))
+            naf.close()
+    else:
+        print("User Already Exists...")
+    if not os.path.exists("private" + name.lower() + ".txt"):
+            naf = open("private" + name.lower() + ".txt",'w')
+            naf.write(name + "," + str(privateplaceholderkey))
+            naf.close()
+
 
 # Implement a console application
 def Inputs():
@@ -76,20 +98,29 @@ def Inputs():
             else:
                 connected = False
 
-            if ( command == "?help" ):
-                print_help()
+            if (command[0] == "?"):
+                if ( command == "?help" ):
+                    print_help()
 
-            elif ( command == "?connect" ):
-                node_connect(node)
-    
-            elif (command == "?cinfo"):
-                node.print_connections()
+                elif ( command == "?connect" ):
+                    node_connect(node)
+        
+                elif ( command == "?cinfo" ):
+                    node.print_connections()
 
-            elif ( command == "?disconnect" ):
-                if (len(node.nodes_outbound) > 0):
-                    node.disconnect_with_node(node.nodes_outbound[0])
-                if (len(node.nodes_inbound) > 0):    
-                    node.disconnect_with_node(node.nodes_inbound[0])
+                elif ( command == "?disconnect" ):
+                    if (len(node.nodes_outbound) > 0):
+                        node.disconnect_with_node(node.nodes_outbound[0])
+                    if (len(node.nodes_inbound) > 0):    
+                        node.disconnect_with_node(node.nodes_inbound[0])
+
+                elif ( command == "?adduser" ):
+                    uname = input("> Username: ")
+                    uhost = input("> User Host: ")
+                    uport = input("> User Port: ")
+                    create_user(uname,uhost,uport)
+                else:
+                    print(command + "is not a Valid Command.")
             else:
                 if connected:
                     node.send_to_nodes(command)

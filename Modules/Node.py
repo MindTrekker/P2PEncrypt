@@ -42,8 +42,8 @@ class MyNode (Node):
             newdata = str(data).removeprefix("¶")
             if (str(data) != newdata):
                 splitData = newdata.lower().split(",")
-                if not os.path.exists(splitData[0] + ".txt"):
-                    f = open(splitData[0] + ".txt", 'w')
+                if not os.path.exists("contact" + splitData[0] + ".txt"):
+                    f = open("contact" + splitData[0] + ".txt", 'w')
                     f.write(newdata)
                     f.close
             else:

@@ -124,6 +124,9 @@ def Inputs():
                     print(command + "is not a Valid Command.")
             else:
                 if connected:
+                    #hash method call
+                    #append hash to message
+                    #encrypt method call
                     node.send_to_nodes(command)
                 else:
                     print("No nodes Connected.")

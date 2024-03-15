@@ -134,11 +134,40 @@ def Hash256(message:str):
             w[i] = binop.binAdd(binop.binAdd(binop.binAdd(w[i-16], s0), w[i-7]), s1)
 
             #intermediary
-            ai = h0
-            bi = h1
-            ci = h2
-            di = h3
-            ei = h4
-            fi = h5
-            gi = h6
-            hi = h7
+        ai = h0
+        bi = h1
+        ci = h2
+        di = h3
+        ei = h4
+        fi = h5
+        gi = h6
+        hi = h7
+
+        for j in range(64):
+            S1 = binop.XORXOR(binop.rotr(ei, 6), binop.rotr(ei, 11), binop.rotr(ei, 25))
+            ch = binop.XOR(binop.AND(ai, bi), binop.AND(binop.NOT(ei), gi))
+            temp1 = binop.binAdd(binop.binAdd(binop.binAdd(binop.binAdd(hi, S1), ch), k[j]), w[j])
+            S0 = binop.XORXOR(binop.rotor(ai, 2), binop.rotr(ai, 13), binop.rotr(ai, 22))
+            m = binop.XORXOR(binop.AND(ai, bi), binop.AND(ai, ci), binop.AND(bi, ci))
+            temp2 = binop.binAdd(S0, m)
+            hi = gi
+            gi = fi
+            fi = ei
+            ei = binop.binAdd(di, temp1)
+            di = ci
+            ci = bi
+            bi = ai
+            ai = binop.binAdd(temp1, temp2)
+
+        h0 = binop.binAdd(h0, ai)
+        h1 = binop.binAdd(h1, bi)
+        h2 = binop.binAdd(h2, ci)
+        h3 = binop.binAdd(h3, di)
+        h4 = binop.binAdd(h4, ei)
+        h5 = binop.binAdd(h5, fi)
+        h6 = binop.binAdd(h6, gi)
+        h7 = binop.binAdd(h7, hi)
+    digest = ''
+    for val in [h0, h1, h2, h3, h4, h5, h6, h7]:
+        digest += __BinToHex(val)
+    return digest

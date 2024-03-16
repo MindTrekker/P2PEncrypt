@@ -6,6 +6,8 @@ from Modules.Node import MyNode
 from Modules.NodeConnection import MyNodeConnection
 import Modules.OurSha256 as OurSha256
 
+from hashlib import sha256
+
 # The port to listen for incoming node connections
 publicDefaultKey = 1234567890
 testIP = "127.0.0.1"
@@ -126,8 +128,8 @@ def Inputs():
             else:
                 if connected:
                     #hash call
-                    hash = OurSha256.Hash256(command)
-                    print(hash)
+                    print(sha256(command.encode('utf-8')).hexdigest())
+                    print(OurSha256.Hash256(command))
                     #append hash to message
                     #encrypt method call
                     node.send_to_nodes(command)

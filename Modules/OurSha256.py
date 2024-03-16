@@ -1,4 +1,4 @@
-import BinListUtil as binop
+from Modules import BinListUtil as binop
 
 def __BitConvert(message:str):
     #convert message into unicode
@@ -13,7 +13,7 @@ def __BitConvert(message:str):
     #convert bytes into a continuous list of bits as integers
     for byte in bytes:
         for bit in byte:
-            bits.append(int(bits))
+            bits.append(int(bit))
 
     return bits
 
@@ -146,8 +146,8 @@ def Hash256(message:str):
         for j in range(64):
             S1 = binop.XORXOR(binop.rotr(ei, 6), binop.rotr(ei, 11), binop.rotr(ei, 25))
             ch = binop.XOR(binop.AND(ai, bi), binop.AND(binop.NOT(ei), gi))
-            temp1 = binop.binAdd(binop.binAdd(binop.binAdd(binop.binAdd(hi, S1), ch), k[j]), w[j])
-            S0 = binop.XORXOR(binop.rotor(ai, 2), binop.rotr(ai, 13), binop.rotr(ai, 22))
+            temp1 = binop.binAdd(binop.binAdd(binop.binAdd(binop.binAdd(hi, S1), ch), k1[j]), w[j])
+            S0 = binop.XORXOR(binop.rotr(ai, 2), binop.rotr(ai, 13), binop.rotr(ai, 22))
             m = binop.XORXOR(binop.AND(ai, bi), binop.AND(ai, ci), binop.AND(bi, ci))
             temp2 = binop.binAdd(S0, m)
             hi = gi

@@ -4,6 +4,7 @@ sys.path.insert(0, r'..\Modules') # Import the files where the modules are locat
 
 from Modules.Node import MyNode
 from Modules.NodeConnection import MyNodeConnection
+import Modules.OurSha256 as OurSha256
 
 # The port to listen for incoming node connections
 publicDefaultKey = 1234567890
@@ -93,7 +94,7 @@ def Inputs():
     connected = False
     command = input()
     while ( command != "?stop" ):
-            
+        if (command != ""):
             if len(node.all_nodes) >= 1:
                 connected = True
             else:
@@ -124,14 +125,16 @@ def Inputs():
                     print(command + "is not a Valid Command.")
             else:
                 if connected:
-                    #hash method call
+                    #hash call
+                    hash = OurSha256.Hash256(command)
+                    print(hash)
                     #append hash to message
                     #encrypt method call
                     node.send_to_nodes(command)
                 else:
                     print("No nodes Connected.")
 
-            command = input()
+        command = input()
 
 Inputs()
 node.stop()

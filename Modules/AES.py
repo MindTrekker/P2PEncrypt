@@ -1,5 +1,5 @@
 from Crypto.Cipher import AES
-from ECDH import *
+from Modules.ECDH import *
 def encrypt(key, data):
 
     key = bytes.fromhex(key)

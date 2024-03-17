@@ -1,6 +1,6 @@
 import random
-from Primes import Primes
 
+#function generates points on the curve
 def generate_points(a, b, p):
     x = 0
     points = []
@@ -22,13 +22,7 @@ def generate_points(a, b, p):
         true_points.append(value)
     return true_points
 
-def random_point(point_set):
-
-    size = len(point_set)
-    random_num = random.randint(0, size-1)
-    print(point_set)
-    return point_set[random_num]
-
+#extended euclid alg
 def egcd(a,b):
   past_r = a
   r = b
@@ -46,6 +40,7 @@ def egcd(a,b):
     past_y , y = y , past_y - q * y
   return int(past_x)
 
+#point doubling, 2P
 def point_dbl(Random_point, Scale, a, p):
     if Random_point == None:
         exit
@@ -63,6 +58,7 @@ def point_dbl(Random_point, Scale, a, p):
         point = (x_r, y_r)
         return point
 
+#Point Multiplication
 def mult_point(point, scale, a, p):
     if scale == 2:
         new_point = point_dbl(point, scale, a , p)
@@ -86,7 +82,8 @@ def mult_point(point, scale, a, p):
 
                 point = (x_r, y_r)
                 return point
-        
+            
+#point was hard set, but belongs to the group y^2 = x^3 + 0x + 7 % 547        
 def shared_point_generator():
     a = 0
     b = 7
@@ -94,31 +91,21 @@ def shared_point_generator():
     point_set = generate_points(a,b,p)
     order = len(point_set)
     rndm_point = (520,543)
-    #grayson_private_key = random.randint(1, order)
-    grayson_public_key = mult_point(rndm_point, grayson_private_key, a, p)
-    #aubrey_private_key = random.randint(1, order)
-    aubrey_public_key = mult_point(rndm_point, aubrey_private_key, a, p)
-    #shared_point = mult_point(grayson_public_key, aubrey_private_key, a, p)
-    #shared_point_check = mult_point(aubrey_public_key, grayson_private_key, a, p)
     return order, rndm_point, a, p
 
-def check_shared_point():
-    point1, point2 = shared_point_generator()
-    while point1 != point2 or point1 is None:
-        point1, point2 = shared_point_generator()
-    return point1[0]
+#Function creates and returns the shared x value between a users private key and a different public key
+def calc_shared_point(user_private_key, differnt_user_public_key, a, p):
+    shared_point = mult_point(differnt_user_public_key, user_private_key, a, p)
+    while shared_point is None:
+        shared_point = mult_point(differnt_user_public_key, user_private_key, a, p)
+    return shared_point[0]
 
-def shared_key_generator():
-    key = check_shared_point()
-    return key
-    
+ #creates private key   
 def create_private_key(order):
     private_key = random.randint(1, order)
     return private_key
 
+#creates public key
 def create_public_key(point, private_key, a, p):
     public_key = mult_point(point, private_key, a, p)
     return public_key
-
-shared_key_generator()
-

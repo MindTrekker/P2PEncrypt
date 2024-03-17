@@ -5,8 +5,9 @@ sys.path.insert(0, r'..\Modules') # Import the files where the modules are locat
 from Modules.Node import MyNode
 from Modules.NodeConnection import MyNodeConnection
 import Modules.OurSha256 as OurSha256
-#import Modules.OurECEIS as OurECEIS
+import Modules.OurECEIS as OurECEIS
 import Modules.generate_points as ECC
+import Modules.ECEIS as ECEIS
 
 from hashlib import sha256
 
@@ -139,9 +140,10 @@ def Inputs():
                     #append hash to message
                     command = command + hash
                     #encrypt method call
-                    #key = getsharedkey(remote-public-key, user-private-key)
-                    #cyphertext = ecrypt(message, key)
-                    #print(OurECEIS.eceis_encrypt('some message'))
+                    print("ECEIS cyphertext:" + ECEIS.lib_ECEIS_encrypt(message))
+                    key = OurECEIS.our_ecdh(privatekey, publickey, a, p)
+                    cyphertext, tag, nonnce = OurECEIS.eceis_encrypt(message, key)
+                    print("OurECEIS cyphertext: " + cyphertext)
                     node.send_to_nodes(command)
                 else:
                     print("No nodes Connected.")

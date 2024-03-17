@@ -5,14 +5,12 @@ import binascii
 privKey = generate_eth_key()
 privKeyHex = privKey.to_hex()
 pubKeyHex = privKey.public_key.to_hex()
-print("Encryption public key:", pubKeyHex)
-print("Decryption private key:", privKeyHex)
 
-plaintext = b'Some plaintext for encryption'
-print("Plaintext:", plaintext)
+def lib_ECEIS_encrypt(message):
+    encrypted = encrypt(pubKeyHex, message)
+    ciphertext = binascii.hexlify(encrypted)
+    return ciphertext
 
-encrypted = encrypt(pubKeyHex, plaintext)
-print("Encrypted:", binascii.hexlify(encrypted))
-
-decrypted = decrypt(privKeyHex, encrypted)
-print("Decrypted:", decrypted)
+def lib_ECEIS_decrypt(ciphertext):
+    decrypted = decrypt(privKeyHex, ciphertext)
+    return decrypted

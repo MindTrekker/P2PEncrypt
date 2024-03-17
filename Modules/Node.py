@@ -1,5 +1,6 @@
 import os.path
 from p2pnetwork.node import Node
+from Modules import OurSha256
 class MyNode (Node):
     
 
@@ -47,6 +48,10 @@ class MyNode (Node):
                     f.write(newdata)
                     f.close
             else:
+                hash = data[-64:]
+                data = data[:-64]
+                if hash == OurSha256.Hash256(data):
+                    print(">> Hash " + hash + " is correct.")
                 print("->" + str(data))
         
     def node_disconnect_with_outbound_node(self, node):

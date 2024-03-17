@@ -15,6 +15,9 @@ publicDefaultKey = 1234567890
 testIP = "127.0.0.1"
 port = 9876 # default
 
+#hardcoded vales
+order, point, a, p = ECC.shared_point_generator()
+
 # Syntax file_sharing_node.py port
 if len(sys.argv) > 1:
     port = int(sys.argv[1])
@@ -77,18 +80,17 @@ def node_connect(node:MyNode):
 
 def create_user(name:str,host:str = testIP, uport:str = str(port)):
     #random key generator code here
-    order, point, a, p = ECC.shared_point_generator()
-    privateplaceholderkey = ECC.create_private_key(order)
-    publicplaceholderkey = ECC.create_public_key(point, privateplaceholderkey, a, p)
+    privatekey = ECC.create_private_key(order)
+    publickey = ECC.create_public_key(point, privatekey, a, p)
     if not os.path.exists(name.lower() + ".txt"):
             naf = open(name.lower() + ".txt",'w')
-            naf.write(name + "," + host + "," + str(uport) + "," + str(publicplaceholderkey))
+            naf.write(name + "," + host + "," + str(uport) + "," + str(publickey))
             naf.close()
     else:
         print("User Already Exists...")
     if not os.path.exists("private" + name.lower() + ".txt"):
             naf = open("private" + name.lower() + ".txt",'w')
-            naf.write(name + "," + str(privateplaceholderkey))
+            naf.write(name + "," + str(privatekey))
             naf.close()
 
 
@@ -137,6 +139,8 @@ def Inputs():
                     #append hash to message
                     command = command + hash
                     #encrypt method call
+                    #key = getsharedkey(remote-public-key, user-private-key)
+                    #cyphertext = ecrypt(message, key)
                     #print(OurECEIS.eceis_encrypt('some message'))
                     node.send_to_nodes(command)
                 else:

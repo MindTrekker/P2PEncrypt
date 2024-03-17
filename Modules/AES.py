@@ -1,9 +1,9 @@
 from Crypto.Cipher import AES
-from Modules.ECDH import *
+from ECDH import *
 def encrypt(key, data):
 
     key = bytes.fromhex(key)
-    print(key)
+    print('The key in AES: ' + str(key))
     data = str(data).encode()
     cipher = AES.new(key, AES.MODE_OCB)
     ciphertext, tag = cipher.encrypt_and_digest(data)

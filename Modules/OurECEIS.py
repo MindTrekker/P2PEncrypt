@@ -1,5 +1,5 @@
-from Modules.AES import encrypt, decrypt
-from Modules.generate_points import *
+from AES import encrypt, decrypt
+from generate_points import *
 import hashlib
 
 shared_key_point = shared_key_generator()

@@ -1,5 +1,5 @@
 import random
-from Modules.Primes import Primes
+from Primes import Primes
 
 def generate_points(a, b, p):
     x = 0
@@ -86,9 +86,13 @@ def mult_point(point, scale, a, p):
                 point = (x_r, y_r)
                 return point
         
-def shared_key_generator():
+def shared_point_generator():
     a = int(random.randint(0,50))
     b = int(random.randint(0,50))
+    check = ((4*(pow(a,3))) + (27*(pow(b,2))))
+    while check == 0:
+        a = int(random.randint(0,50))
+        b = int(random.randint(0,50))
     rand_prime = random.randint(0, len(Primes)-1)
     p = Primes[rand_prime]
     point_set = generate_points(a,b,p)
@@ -100,10 +104,18 @@ def shared_key_generator():
     aubrey_public_key = mult_point(rndm_point, aubrey_private_key, a, p)
     shared_point = mult_point(grayson_public_key, aubrey_private_key, a, p)
     shared_point_check = mult_point(aubrey_public_key, grayson_private_key, a, p)
-    if shared_point == shared_point_check and shared_point is not None:
-        return shared_point[0]
-    else:
-        shared_key_generator()
+    return shared_point, shared_point_check
+
+def check_shared_point():
+    point1, point2 = shared_point_generator()
+    while point1 != point2 or point1 is None:
+        point1, point2 = shared_point_generator()
+    return point1[0]
+
+def shared_key_generator():
+    key = check_shared_point()
+    return key
+    
 
 shared_key_generator()
 

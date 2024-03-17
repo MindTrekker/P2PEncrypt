@@ -5,6 +5,7 @@ sys.path.insert(0, r'..\Modules') # Import the files where the modules are locat
 from Modules.Node import MyNode
 from Modules.NodeConnection import MyNodeConnection
 import Modules.OurSha256 as OurSha256
+import Modules.OurECEIS as OurECEIS
 
 from hashlib import sha256
 
@@ -132,6 +133,7 @@ def Inputs():
                     print(OurSha256.Hash256(command))
                     #append hash to message
                     #encrypt method call
+                    print(OurECEIS.eceis_encrypt('some message'))
                     node.send_to_nodes(command)
                 else:
                     print("No nodes Connected.")

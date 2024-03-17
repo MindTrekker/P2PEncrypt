@@ -3,6 +3,7 @@ from Modules.ECDH import *
 def encrypt(key, data):
 
     key = bytes.fromhex(key)
+    print(key)
     data = str(data).encode()
     cipher = AES.new(key, AES.MODE_OCB)
     ciphertext, tag = cipher.encrypt_and_digest(data)
@@ -13,4 +14,5 @@ def decrypt(key, data, tag, nonce):
     
     key = bytes.fromhex(key)
     decipher = AES.new(key, AES.MODE_OCB, nonce=nonce)
-    print(decipher.decrypt_and_verify(data, tag))
+    message = decipher.decrypt_and_verify(data, tag)
+    return message

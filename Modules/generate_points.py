@@ -1,5 +1,5 @@
 import random
-from Primes import Primes
+from Modules.Primes import Primes
 
 def generate_points(a, b, p):
     x = 0
@@ -46,18 +46,21 @@ def egcd(a,b):
   return int(past_x)
 
 def point_dbl(Random_point, Scale, a, p):
-    x = Random_point[0]
-    y = Random_point[1]
-    top_z = (3*(pow(x,Scale)) + a) % p
-    low_z = (Scale * y) % p
-    top_z = top_z % p
-    low_z = egcd(low_z, p)
-    z = (top_z * low_z) % p
-    x_r = (pow(z,2) - x - x) % p
-    y_r = (z*(x - x_r) - y) % p
+    if Random_point == None:
+        exit
+    else:
+        x = Random_point[0]
+        y = Random_point[1]
+        top_z = (3*(pow(x,Scale)) + a) % p
+        low_z = (Scale * y) % p
+        top_z = top_z % p
+        low_z = egcd(low_z, p)
+        z = (top_z * low_z) % p
+        x_r = (pow(z,2) - x - x) % p
+        y_r = (z*(x - x_r) - y) % p
 
-    point = (x_r, y_r)
-    return point
+        point = (x_r, y_r)
+        return point
 
 def mult_point(point, scale, a, p):
     if scale == 2:
@@ -65,20 +68,23 @@ def mult_point(point, scale, a, p):
         return new_point
     else:
         while scale > 1:
-            new_point = mult_point(point, scale - 1, a, p)
-            x_1 = new_point[0]
-            y_1 = new_point[1]
-            x = point[0]
-            y = point[1]
-            new_y = (y_1 - y) % p
-            new_x = (x_1 - x) % p
-            new_x = egcd(new_x,p)
-            z = (new_y * new_x) % p
-            x_r = (pow(z,2) - x - x_1) % p
-            y_r = (z*(x - x_r) - y) % p
+            if point == None:
+                break
+            else:
+                new_point = mult_point(point, scale - 1, a, p)
+                x_1 = new_point[0]
+                y_1 = new_point[1]
+                x = point[0]
+                y = point[1]
+                new_y = (y_1 - y) % p
+                new_x = (x_1 - x) % p
+                new_x = egcd(new_x,p)
+                z = (new_y * new_x) % p
+                x_r = (pow(z,2) - x - x_1) % p
+                y_r = (z*(x - x_r) - y) % p
 
-            point = (x_r, y_r)
-            return point
+                point = (x_r, y_r)
+                return point
         
 def shared_key_generator():
     a = int(random.randint(0,50))
@@ -94,10 +100,8 @@ def shared_key_generator():
     aubrey_public_key = mult_point(rndm_point, aubrey_private_key, a, p)
     shared_point = mult_point(grayson_public_key, aubrey_private_key, a, p)
     shared_point_check = mult_point(aubrey_public_key, grayson_private_key, a, p)
-    if shared_point == shared_point_check:
-        print(shared_point)
-        print(shared_point_check)
-        return shared_point
+    if shared_point == shared_point_check and shared_point is not None:
+        return shared_point[0]
     else:
         shared_key_generator()
 

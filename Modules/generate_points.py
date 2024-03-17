@@ -26,6 +26,7 @@ def random_point(point_set):
 
     size = len(point_set)
     random_num = random.randint(0, size-1)
+    print(point_set)
     return point_set[random_num]
 
 def egcd(a,b):
@@ -87,24 +88,19 @@ def mult_point(point, scale, a, p):
                 return point
         
 def shared_point_generator():
-    a = int(random.randint(0,50))
-    b = int(random.randint(0,50))
-    check = ((4*(pow(a,3))) + (27*(pow(b,2))))
-    while check == 0:
-        a = int(random.randint(0,50))
-        b = int(random.randint(0,50))
-    rand_prime = random.randint(0, len(Primes)-1)
-    p = Primes[rand_prime]
+    a = 0
+    b = 7
+    p = 547
     point_set = generate_points(a,b,p)
     order = len(point_set)
-    rndm_point = random_point(point_set)
-    grayson_private_key = random.randint(0, order)
+    rndm_point = (520,543)
+    #grayson_private_key = random.randint(1, order)
     grayson_public_key = mult_point(rndm_point, grayson_private_key, a, p)
-    aubrey_private_key = random.randint(0, order)
+    #aubrey_private_key = random.randint(1, order)
     aubrey_public_key = mult_point(rndm_point, aubrey_private_key, a, p)
-    shared_point = mult_point(grayson_public_key, aubrey_private_key, a, p)
-    shared_point_check = mult_point(aubrey_public_key, grayson_private_key, a, p)
-    return shared_point, shared_point_check
+    #shared_point = mult_point(grayson_public_key, aubrey_private_key, a, p)
+    #shared_point_check = mult_point(aubrey_public_key, grayson_private_key, a, p)
+    return order, rndm_point, a, p
 
 def check_shared_point():
     point1, point2 = shared_point_generator()
@@ -116,6 +112,13 @@ def shared_key_generator():
     key = check_shared_point()
     return key
     
+def create_private_key(order):
+    private_key = random.randint(1, order)
+    return private_key
+
+def create_public_key(point, private_key, a, p):
+    public_key = mult_point(point, private_key, a, p)
+    return public_key
 
 shared_key_generator()
 

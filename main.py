@@ -6,6 +6,7 @@ from Modules.Node import MyNode
 from Modules.NodeConnection import MyNodeConnection
 import Modules.OurSha256 as OurSha256
 #import Modules.OurECEIS as OurECEIS
+import Modules.generate_points as ECC
 
 from hashlib import sha256
 
@@ -76,8 +77,9 @@ def node_connect(node:MyNode):
 
 def create_user(name:str,host:str = testIP, uport:str = str(port)):
     #random key generator code here
-    publicplaceholderkey = 123456789
-    privateplaceholderkey = 987654321
+    order, point, a, p = ECC.shared_point_generator()
+    privateplaceholderkey = ECC.create_private_key(order)
+    publicplaceholderkey = ECC.create_public_key(point, privateplaceholderkey, a, p)
     if not os.path.exists(name.lower() + ".txt"):
             naf = open(name.lower() + ".txt",'w')
             naf.write(name + "," + host + "," + str(uport) + "," + str(publicplaceholderkey))

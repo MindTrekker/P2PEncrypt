@@ -55,21 +55,33 @@ class MyNode (Node):
                     f = open("contact" + splitData[0] + ".txt", 'w')
                     f.write(newdata)
                     f.close
-                remotePubKey = literal_eval(splitData[3])
                 remoteUser = splitData[0]
+                nf = open("remoteUser.txt", 'w')
+                nf.write(remoteUser)
+                nf.close
             else:
                 #decrypt and such
                 ##get our private key
-                curUser = self.id.split(";")[0]
-                if remoteUser == curUser:
-                    curUser = self.id.split(";")[1]
+                curUser = ""
+                if os.path.exists("currentUser.txt"):
+                    f = open("currentUser.txt", 'r')
+                    curUser = f.readline()
+                    f.close
+                if os.path.exists("remoteUser.txt"):
+                    f = open("remoteUser.txt", 'r')
+                    remoteUser = f.readline()
+                    f.close
+                if os.path.exists("contact" + remoteUser + ".txt"):
+                    f = open("contact" + remoteUser + ".txt", 'r')
+                    remotePubKey = literal_eval(f.readline().split(";")[3])
+                    f.close
                 if os.path.exists("private" + curUser + ".txt"):
                     f = open("private" + curUser + ".txt", 'r')
                     privKey = int(f.readline().split(";")[1])
                     f.close
                 ##decrypt
                 sharedKey = ECC.calc_shared_point(privKey,remotePubKey, a, p)
-                data = OurECEIS.eceis_decrypt(sharedKey, data)
+                data = OurECEIS.eceis_decrypt(sharedKey, bytes.fromhex(data))
                 ##hash
                 hash = data[-64:]
                 data = data[:-64]

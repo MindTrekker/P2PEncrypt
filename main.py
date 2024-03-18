@@ -44,6 +44,10 @@ while conInfo == "":
         fi.close()
     else:
         print("User file does not exist...")
+
+    nfi = open("currentUser.txt", 'w')
+    nfi.write(curUser)
+    nfi.close()
         
 # Instantiate the node MyNode, it creates a thread to handle all functionality
 node = MyNode(testIP, port,None,None,1)
@@ -62,8 +66,6 @@ def print_help():
     print("?changekeys - debug method to alter stored keys.")
 
 def node_connect(node:MyNode):
-    
-    remotePubKey = ""
     ipIn = input("> Remote Host:")
     if (ipIn[0].isalpha()):
         #name stuff
@@ -74,8 +76,7 @@ def node_connect(node:MyNode):
             splitInfo = info.split(";")
             foIP = splitInfo[1]
             foPort = int(splitInfo[2])
-            node.connect_with_node(foIP, foPort, curUser + ";" + ipIn)
-            remotePubKey = literal_eval(splitInfo[3])
+            node.connect_with_node(foIP, foPort)
         else:
             print("Contact not found...")
     else:
@@ -83,7 +84,7 @@ def node_connect(node:MyNode):
         node.connect_with_node(ipIn, portIn)
     
     node.send_to_nodes("¶" + conInfo)
-    return remotePubKey
+    return ipIn
 
 def create_user(name:str,host:str = testIP, uport:str = str(port)):
     #random key generator code here
@@ -99,11 +100,18 @@ def create_user(name:str,host:str = testIP, uport:str = str(port)):
             naf = open("private" + name.lower() + ".txt",'w')
             naf.write(name + ";" + str(privatekey))
             naf.close()
-
+def getPubKey(remote:str):
+     if os.path.exists("contact" + remote.lower() + ".txt"):
+            fo = open("contact" + remote.lower() + ".txt",'r')
+            info = fo.readline()
+            fo.close()
+            splitInfo = info.split(";")
+            return literal_eval(splitInfo[3])
 # Implement a console application
 def Inputs():
     privKey = 0
     remotePubKey = ()
+    remoteHost = ""
     if os.path.exists("private" + curUser.lower() + ".txt"):
             fo = open("private" + curUser.lower() + ".txt",'r')
             info = fo.readline()
@@ -125,8 +133,11 @@ def Inputs():
                     print_help()
 
                 elif ( command == "?connect" ):
-                    remotePubKey = node_connect(node)
-        
+                    remoteHost = node_connect(node)
+                    nf = open("remoteUser.txt", 'w')
+                    nf.write(remoteHost)
+                    nf.close
+                    
                 elif ( command == "?cinfo" ):
                     node.print_connections()
 
@@ -154,11 +165,15 @@ def Inputs():
                     #append hash to message
                     command = command + hash
                     #encrypt method call
+                    nf = open("remoteUser.txt", 'r')
+                    remoteHost = nf.readline()
+                    nf.close
                     #print("ECEIS cyphertext:" + ECEIS.lib_ECEIS_encrypt(command))
+                    remotePubKey = getPubKey(remoteHost)
                     key = OurECEIS.our_ecdh(privKey, remotePubKey, a, p)
                     cyphertext, tag, nonnce = OurECEIS.eceis_encrypt(command, key)
                     print("OurECEIS cyphertext: " + cyphertext.hex())
-                    node.send_to_nodes(cyphertext)
+                    node.send_to_nodes(cyphertext.hex())
                 else:
                     print("No nodes Connected.")
 

@@ -20,3 +20,6 @@ Type in "grayson" if the local user is "aubrey" and vice versa.
 Once it indicats a connection is made, you may type whatever and it will be sent to the other terminal along with info about the encryption and hashing used.
 
 typing ?stop will disband the connection and end the program in the terminal it was typed on.
+
+Demonstration Video Link:
+https://youtu.be/VOrhbSUgm3Q

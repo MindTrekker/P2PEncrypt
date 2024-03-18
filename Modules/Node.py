@@ -80,9 +80,11 @@ class MyNode (Node):
                     privKey = int(f.readline().split(";")[1])
                     f.close
                 ##decrypt
-                sharedKey = ECC.calc_shared_point(privKey,remotePubKey, a, p)
+                sharedKey = OurECEIS.our_ecdh(privKey, remotePubKey, a, p)
                 cypherTagNonnce = data.split("¶")
-                data = OurECEIS.eceis_decrypt(str(sharedKey), bytes.fromhex(cypherTagNonnce[0]), bytes.fromhex(cypherTagNonnce[1]),bytes.fromhex(cypherTagNonnce[2]))
+                print('Receiver Cyphertext: ' + cypherTagNonnce[0])
+                data = OurECEIS.eceis_decrypt(sharedKey, bytes.fromhex(cypherTagNonnce[0]), bytes.fromhex(cypherTagNonnce[1]),bytes.fromhex(cypherTagNonnce[2]))
+                data = data.decode('utf-8')
                 ##hash
                 hash = data[-64:]
                 data = data[:-64]

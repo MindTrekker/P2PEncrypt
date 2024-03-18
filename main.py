@@ -1,6 +1,6 @@
 import sys
 import os.path
-sys.path.insert(0, r'..\Modules') # Import the files where the modules are located
+sys.path.insert(0, '../Modules') # Import the files where the modules are located
 
 from Modules.Node import MyNode
 from Modules.NodeConnection import MyNodeConnection

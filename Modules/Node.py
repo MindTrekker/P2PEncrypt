@@ -1,6 +1,10 @@
 import os.path
 from p2pnetwork.node import Node
 from Modules import OurSha256
+import Modules.OurECEIS as OurECEIS
+import Modules.generate_points as ECC
+import Modules.ECEIS as ECEIS
+from ast import literal_eval
 class MyNode (Node):
     
 
@@ -40,14 +44,33 @@ class MyNode (Node):
         if (self.debug):
             print("node_message (" + self.id + ") from " + node.id + ": " + str(data))
         else:
+            order, point, a, p = ECC.shared_point_generator()
+            remotePubKey = ()
+            privKey = 0
+            remoteUser = ""
             newdata = str(data).removeprefix("¶")
             if (str(data) != newdata):
-                splitData = newdata.lower().split(",")
+                splitData = newdata.lower().split(";")
                 if not os.path.exists("contact" + splitData[0] + ".txt"):
                     f = open("contact" + splitData[0] + ".txt", 'w')
                     f.write(newdata)
                     f.close
+                remotePubKey = literal_eval(splitData[3])
+                remoteUser = splitData[0]
             else:
+                #decrypt and such
+                ##get our private key
+                curUser = self.id.split(";")[0]
+                if remoteUser == curUser:
+                    curUser = self.id.split(";")[1]
+                if os.path.exists("private" + curUser + ".txt"):
+                    f = open("private" + curUser + ".txt", 'r')
+                    privKey = int(f.readline().split(";")[1])
+                    f.close
+                ##decrypt
+                sharedKey = ECC.calc_shared_point(privKey,remotePubKey, a, p)
+                data = OurECEIS.eceis_decrypt(sharedKey, data)
+                ##hash
                 hash = data[-64:]
                 data = data[:-64]
                 if hash == OurSha256.Hash256(data):

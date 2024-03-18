@@ -4,10 +4,12 @@ sys.path.insert(0, r'..\Modules') # Import the files where the modules are locat
 
 from Modules.Node import MyNode
 from Modules.NodeConnection import MyNodeConnection
+from ast import literal_eval
 import Modules.OurSha256 as OurSha256
 import Modules.OurECEIS as OurECEIS
 import Modules.generate_points as ECC
 import Modules.ECEIS as ECEIS
+
 
 from hashlib import sha256
 
@@ -26,17 +28,17 @@ if len(sys.argv) > 1:
 #create default file
 if not os.path.exists("default.txt"):
     f = open("default.txt",'w')
-    f.write("default," + testIP + "," + str(port) + "," + str(publicDefaultKey))
+    f.write("default," + testIP + ";" + str(port) + ";" + str(publicDefaultKey))
     f.close()
 
-
+curUser = ""
 conInfo = ""
 while conInfo == "":
     curUser = input("> Local User Name:")
     if os.path.exists(curUser.lower() + ".txt"):
         fi = open(curUser.lower() + ".txt", 'r')
         conInfo = fi.readline()
-        splitinfo = conInfo.split(",")
+        splitinfo = conInfo.split(";")
         testIP = splitinfo[1]
         port = int(splitinfo[2])
         fi.close()
@@ -57,9 +59,11 @@ def print_help():
     print("?disconnect - Disonnect from the current node.")
     print("?cinfo - Get connection info.")
     print("?adduser - creates a new user file.")
+    print("?changekeys - debug method to alter stored keys.")
 
 def node_connect(node:MyNode):
     
+    remotePubKey = ""
     ipIn = input("> Remote Host:")
     if (ipIn[0].isalpha()):
         #name stuff
@@ -67,10 +71,11 @@ def node_connect(node:MyNode):
             fo = open("contact" + ipIn.lower() + ".txt",'r')
             info = fo.readline()
             fo.close()
-            splitInfo = info.split(",")
+            splitInfo = info.split(";")
             foIP = splitInfo[1]
             foPort = int(splitInfo[2])
-            node.connect_with_node(foIP, foPort)
+            node.connect_with_node(foIP, foPort, curUser + ";" + ipIn)
+            remotePubKey = literal_eval(splitInfo[3])
         else:
             print("Contact not found...")
     else:
@@ -78,6 +83,7 @@ def node_connect(node:MyNode):
         node.connect_with_node(ipIn, portIn)
     
     node.send_to_nodes("¶" + conInfo)
+    return remotePubKey
 
 def create_user(name:str,host:str = testIP, uport:str = str(port)):
     #random key generator code here
@@ -85,18 +91,24 @@ def create_user(name:str,host:str = testIP, uport:str = str(port)):
     publickey = ECC.create_public_key(point, privatekey, a, p)
     if not os.path.exists(name.lower() + ".txt"):
             naf = open(name.lower() + ".txt",'w')
-            naf.write(name + "," + host + "," + str(uport) + "," + str(publickey))
+            naf.write(name + ";" + host + ";" + str(uport) + ";" + str(publickey))
             naf.close()
     else:
         print("User Already Exists...")
     if not os.path.exists("private" + name.lower() + ".txt"):
             naf = open("private" + name.lower() + ".txt",'w')
-            naf.write(name + "," + str(privatekey))
+            naf.write(name + ";" + str(privatekey))
             naf.close()
-
 
 # Implement a console application
 def Inputs():
+    privKey = 0
+    remotePubKey = ()
+    if os.path.exists("private" + curUser.lower() + ".txt"):
+            fo = open("private" + curUser.lower() + ".txt",'r')
+            info = fo.readline()
+            fo.close()
+            privKey = int(info.split(";")[1])
     
     print("Connect to a remote node to get started: type?help for a list of commands")
     connected = False
@@ -113,7 +125,7 @@ def Inputs():
                     print_help()
 
                 elif ( command == "?connect" ):
-                    node_connect(node)
+                    remotePubKey = node_connect(node)
         
                 elif ( command == "?cinfo" ):
                     node.print_connections()
@@ -129,6 +141,8 @@ def Inputs():
                     uhost = input("> User Host: ")
                     uport = input("> User Port: ")
                     create_user(uname,uhost,uport)
+                #elif ( command == "?changeKeys" ):
+                    #unipmlimented
                 else:
                     print(command + "is not a Valid Command.")
             else:
@@ -140,11 +154,11 @@ def Inputs():
                     #append hash to message
                     command = command + hash
                     #encrypt method call
-                    print("ECEIS cyphertext:" + ECEIS.lib_ECEIS_encrypt(message))
-                    key = OurECEIS.our_ecdh(privatekey, publickey, a, p)
-                    cyphertext, tag, nonnce = OurECEIS.eceis_encrypt(message, key)
-                    print("OurECEIS cyphertext: " + cyphertext)
-                    node.send_to_nodes(command)
+                    #print("ECEIS cyphertext:" + ECEIS.lib_ECEIS_encrypt(command))
+                    key = OurECEIS.our_ecdh(privKey, remotePubKey, a, p)
+                    cyphertext, tag, nonnce = OurECEIS.eceis_encrypt(command, key)
+                    print("OurECEIS cyphertext: " + cyphertext.hex())
+                    node.send_to_nodes(cyphertext)
                 else:
                     print("No nodes Connected.")
 

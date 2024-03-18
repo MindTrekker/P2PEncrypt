@@ -81,7 +81,8 @@ class MyNode (Node):
                     f.close
                 ##decrypt
                 sharedKey = ECC.calc_shared_point(privKey,remotePubKey, a, p)
-                data = OurECEIS.eceis_decrypt(sharedKey, bytes.fromhex(data))
+                cypherTagNonnce = data.split("¶")
+                data = OurECEIS.eceis_decrypt(str(sharedKey), bytes.fromhex(cypherTagNonnce[0]), bytes.fromhex(cypherTagNonnce[1]),bytes.fromhex(cypherTagNonnce[2]))
                 ##hash
                 hash = data[-64:]
                 data = data[:-64]

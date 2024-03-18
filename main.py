@@ -173,7 +173,7 @@ def Inputs():
                     key = OurECEIS.our_ecdh(privKey, remotePubKey, a, p)
                     cyphertext, tag, nonnce = OurECEIS.eceis_encrypt(command, key)
                     print("OurECEIS cyphertext: " + cyphertext.hex())
-                    node.send_to_nodes(cyphertext.hex())
+                    node.send_to_nodes(cyphertext.hex() + "¶" + tag.hex() + "¶" + nonnce.hex())
                 else:
                     print("No nodes Connected.")
 
